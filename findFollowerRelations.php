@@ -2,12 +2,11 @@
 
 /**
 * Author: Cody Reibsome (creibsom@mail.umw.edu)
-* Last Updated: 1/18/2014
+* Last Updated: 1/19/2014
 * Description: Uses Abraham's TwitterOAuth Library to:
-*	1) Query a user_id from a given screen_name
-*	2) Depending on numQueries: Query a list of user_id's of the user's friends and followers (numQueries > 0)
-*	3) If numQueries > 1, query all of the previously found user_id's for their friends and followers
-* Usage: ./findFollowerRelations.php CONSUMER_KEY CONSUMER_SECRET OAUTH_TOKEN OAUTH_TOKEN_SECRET screen_name numQueries
+*	1) Query the given screen_name's id (idOrRelations == 0)
+*	2) Query all of the given user_id's friends and followers (idOrRelations != 0)
+* Usage: ./findFollowerRelations.php CONSUMER_KEY CONSUMER_SECRET OAUTH_TOKEN OAUTH_TOKEN_SECRET screenNameOrId idOrRelations
 */ 
 
 	//Include Abraham's TwitterOAuth Library
@@ -19,12 +18,47 @@
 	$OAUTH_TOKEN = $argv[3];
 	$OAUTH_TOKEN_SECRET = $argv[4];
 	
-	//Retrieve remaining arguments for clarity
-	$screenName = $argv[5];
-	$numQueries = $argv[6];
-
+	//Open a TwitterOAuth 'connection' and query the screen_name given in argv[5]
 	$connection = new TwitterOAuth($CONSUMER_KEY, $CONSUMER_SECRET, $OAUTH_TOKEN, $OAUTH_TOKEN_SECRET);
-	$userInfo = $connection->get('users/show', array('screen_name' => $screenName));
 
-	print_r($userInfo);
+	//If we're just retrieving the user_id for the provided screen_name:
+	if($argv[6] == 0) {
+		$screenName = $argv[5];
+		$userInfo = $connection->get('users/show', array('screen_name' => $screenName));
+
+		//Pull and print the id from the JSON-decoded userInfo
+		print_r($userInfo->{'id'});
+	}
+	//Otherwise, we're provided a user_id and expected to find the friends and followers:
+	else {
+		$id = $argv[5];
+		$curs = -1;
+		//Twitter API pulls 5000 id's at a time, if there are more, $curs != 0
+		do {
+			//Query data
+			$followerInfo = $connection->get('followers/ids', array('user_id' => $id, 'cursor' => $curs));
+			$followerList = $followerInfo->{'ids'};
+		
+			//Dump in files
+			foreach($followerList as $followerId) {
+				file_put_contents("data.csv", $followerId.",".$id."\n", FILE_APPEND | LOCK_EX);
+				file_put_contents("id_dump.txt", $followerId."\n", FILE_APPEND | LOCK_EX);
+			}
+			//Check if more data to query
+			$curs = $followerInfo->{'next_cursor'};
+		}while($curs != 0);
+	
+		//Repeat for friends
+		$curs = -1;
+		do {
+			$friendInfo = $connection->get('friends/ids', array('user_id' => $id));
+			$friendList = $friendInfo->{'ids'};
+
+			foreach($friendList as $friendId) {
+				file_put_contents("data.csv", $id.",".$friendId."\n", FILE_APPEND | LOCK_EX);
+				file_put_contents("id_dump.txt", $friendId."\n", FILE_APPEND | LOCK_EX);
+			}
+			$curs = $friendInfo->{'next_cursor'};
+		}while($curs != 0);
+	}
 ?>
