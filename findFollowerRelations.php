@@ -46,6 +46,13 @@
 			}
 			//Check if more data to query
 			$curs = $followerInfo->{'next_cursor'};
+
+			//Print out how many queries remain until the rate limit
+			$rateLimit = $connection->get('application/rate_limit_status', array('resources' => 'followers'));
+			$followersL = $rateLimit->{'resources'};
+			$followerIdsL = $followersL->{'followers'};
+			print("Follower Query Limit:\n");
+			print_r($followerIdsL->{'/followers/ids'}); 
 		}while($curs != 0);
 	
 		//Repeat for friends
@@ -59,6 +66,13 @@
 				file_put_contents("id_dump.txt", $friendId."\n", FILE_APPEND | LOCK_EX);
 			}
 			$curs = $friendInfo->{'next_cursor'};
+			
+			//Print out how many queries remain until the rate limit
+			$rateLimit = $connection->get('application/rate_limit_status', array('resources' => 'friends'));
+			$friendsL = $rateLimit->{'resources'};
+			$friendIdsL = $friendsL->{'friends'};
+			print("Friend Query Limit:\n");
+			print_r($friendIdsL->{'/friends/ids'}); 
 		}while($curs != 0);
 	}
 ?>
