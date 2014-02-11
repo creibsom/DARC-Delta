@@ -1,1 +1,5 @@
 For compatibility please ensure that your .RData files are in a directory named "Data".
+
+* Source cleanUp.R
+* Run cleanData() to remove bad data
+* Source loadData.R to reconstruct the darcData.csv file with correct information after cleaning it

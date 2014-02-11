@@ -7,6 +7,7 @@ library(foreach)
 registerDoParallel(8)
 
 # Strips all bad data from the files given by darcData.csv.
+# Appends a progress indicator to log.txt before editing each file
 # Returns a data frame with [numToFieldEmptyRemoved, numRetweetsRemoved] for each file.
 cleanData = function() {
   data = read.csv("darcData.csv")
@@ -30,7 +31,7 @@ cleanData = function() {
 		toRemoveRT = grep("RT:", users$tweet, ignore.case = TRUE)
 		# Edge-case: If length(toRemoveRT) == 0, do nothing (otherwise all entries will be removed from users)
 		if (length(toRemoveRT) > 0) users = users[-toRemoveRT,]
-		save(users, file = as.character(data[i,]$fileName))
+		save(users, file = paste("Data", data[i,]$fileName, sep = "/"))
 		c(out, data.frame(blankToFieldNum = length(toRemoveTo), retweets = length(toRemoveRT)))
 	}
 	return(out)
