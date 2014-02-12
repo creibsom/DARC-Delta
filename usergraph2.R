@@ -1,3 +1,21 @@
+# From Dave 2/10/14:
+# The enclosed will read in two weeks of data and make two graphs, one for
+# the first week, the other for the second. By turning this into a function
+# and making it so one specifies the week (and/or the start/duration) one
+# can have a function that reads in a graph covering a fixed amount of
+# time. It takes 48 minutes to get both graphs on my machine and uses about
+# 17% of the 32G ram.
+# 
+# The graphs have orders:  3,074,617 and 2,422,840 with 1,300,538 vertices
+# in common. To see this last, do length(intersect(V(g1)$name,V(g2)$name))
+# The largest connected components of the two graphs have 2,646,704 and
+# 1,957,869 respectively.
+# 
+# I think you can use these graphs (or similar ones) to play around with as
+# a starting point for your analysis.  The enclosed plot shows the degree
+# distributions for the two graphs. It worries me -- I wonder if I'm doing
+# something wrong.
+
 require(lubridate) 
 require(igraph)
  
