@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+import ec.util.MersenneTwisterFast;
 import sim.engine.*;
 import java.util.HashMap;
         
@@ -14,13 +9,14 @@ import java.util.HashMap;
  */
 public class TwitterSimul extends SimState {
     
-    HashMap<Integer, User> users = new HashMap();
-    final static int NUM_USERS = 300;
+    private HashMap<Integer, User> users = new HashMap();
+    public final static int NUM_USERS = 300;
+    private static MersenneTwisterFast twist = new MersenneTwisterFast();
     
     public TwitterSimul(long seed) {
         super(seed);
         for(int i = 0; i < NUM_USERS; i++) {
-            users.put(i, new User(i, findFreq(), findNumFollowees()));
+            users.put(i, new User(i, findFreq(), findNumFollowees(), twist));
         }
     }
     
