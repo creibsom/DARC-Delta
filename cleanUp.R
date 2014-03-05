@@ -2,7 +2,6 @@
 # Last Updated: 2/11/2014
 library(doParallel)
 library(foreach)
-
 # Allows for use of up to 8 cores, won't negatively affect performance if numCores < 8.
 registerDoParallel(8)
 
@@ -34,5 +33,6 @@ cleanData = function() {
 		save(users, file = paste("Data", data[i,]$fileName, sep = "/"))
 		c(out, data.frame(blankToFieldNum = length(toRemoveTo), retweets = length(toRemoveRT)))
 	}
+	source("loadData.R")
 	return(out)
 }		
