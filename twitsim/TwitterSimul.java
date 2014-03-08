@@ -123,7 +123,7 @@ public class TwitterSimul extends SimState {
     
     /**
      * Accessor method to add a tweet to ArrayList tweets.
-     * @param tw 
+     * @param tw
      */
     public void catchTweet(Tweet tw) {
         tweets.add(tw);
