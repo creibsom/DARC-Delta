@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 For compatibility please ensure that your .RData files are in a directory named "Data".
 
 * Source cleanUp.R
@@ -7,22 +6,9 @@ For compatibility please ensure that your .RData files are in a directory named 
 
 Java Simulation:
 
-* javac TwitterSimul.java User.java Tweet.java
+* cd TwitterSimulation
+* javac src/twittersimulation/TwitterSimul.java src/twittersimulation/User.java src/twittersimulation/Tweet.java
 * java TwitterSimul -time numHoursToSimulate
 
 User relations will be output to "relations.csv"
-=======
-For compatibility please ensure that your .RData files are in a directory named "Data".
-
-* Source cleanUp.R
-* Run cleanData() to remove bad data
-
-
-Java Simulation:
-
-* javac TwitterSimul.java User.java Tweet.java
-* java TwitterSimul -time numHoursToSimulate
-
-User relations will be output to "relations.csv"
->>>>>>> 13d7f21e234f282c3af89d28c8387e5ff9961444
 Tweets will be output to "tweets.csv"
