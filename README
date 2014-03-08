@@ -2,4 +2,12 @@ For compatibility please ensure that your .RData files are in a directory named 
 
 * Source cleanUp.R
 * Run cleanData() to remove bad data
-* Source loadData.R to reconstruct the darcData.csv file with correct information after cleaning it
+
+
+Java Simulation:
+
+* javac TwitterSimul.java User.java Tweet.java
+* java TwitterSimul -time numHoursToSimulate
+
+User relations will be output to "relations.csv"
+Tweets will be output to "tweets.csv"
