@@ -1,12 +1,12 @@
 /**
  * Representation of a Tweet object. Mostly a container class.
  * @author Cody Reibsome
- * @date 03/07/14
+ * @date 03/08/14
  */
 public class Tweet {
 
-    private int tweeterID, tweeteeID;
-    private int hourOfTweet;
+    private final int tweeterID, tweeteeID;
+    private final int hourOfTweet;
     
     /**
      * Constructs a new Tweet object.
@@ -24,7 +24,8 @@ public class Tweet {
      * Creates and returns String representation of the Tweet object
      * @return tweeterID, tweeteeID, and hourOfTweet as a CSV line
      */
+    @Override
     public String toString() {
-        return "" + tweeterID + "," + tweeteeID + "," + hourOfTweet;
+        return "" + tweeterID + "," + tweeteeID + "," + hourOfTweet + "\n";
     }
 }

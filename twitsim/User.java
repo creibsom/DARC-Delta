@@ -1,16 +1,18 @@
 import java.util.ArrayList;
 import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 
 /**
  * Object representing a Twitter user. Has the capability to send and receive Tweet objects.
  * @author Cody Reibsome (creibsom@mail.umw.edu)
- * @date 03/07/2014
+ * @date 03/08/2014
  */
-public class User {
+public class User implements Steppable {
     
-    private int id;
-    private double freq;
-    private ArrayList<Integer> followees = new ArrayList();
+    private final int id;
+    private final double freq;
+    private final ArrayList<Integer> followees = new ArrayList();
     private MersenneTwisterFast rn;
     
     /**
@@ -35,6 +37,22 @@ public class User {
            }
            followees.add(temp);
         }
+    }
+    
+    /**
+     * 
+     * @param state 
+     */
+    @Override
+    public void step(SimState state) {
+        TwitterSimul sim = (TwitterSimul) state;
+        //Generate a random boolean with probability equal to the user's tweet
+        //frequency. If true, tweet to a random user. If not, do nothing.
+           if(rn.nextBoolean(freq)) {
+               int userToID = followees.get(rn.nextInt() % followees.size());
+               int stepNum = (int) sim.schedule.getSteps();
+               sim.catchTweet(sendTweet(userToID, stepNum));
+           } 
     }
     
     /**
