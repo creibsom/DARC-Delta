@@ -56,6 +56,7 @@ public class TwitterSimul extends SimState {
             br = new BufferedReader(new FileReader("degreeDist.csv"));
             String line;
             String[] temp;
+            line = br.readLine(); //Skip first line
             while((line = br.readLine()) != null) {
                 temp = line.split(",");
                 // 168 is the number of hours in a week
@@ -86,9 +87,10 @@ public class TwitterSimul extends SimState {
             br = new BufferedReader(new FileReader("friendDist.csv"));
             String line;
             String[] temp;
+            line = br.readLine(); //Skip first line
             while((line = br.readLine()) != null) {
                 temp = line.split(",");
-                followeesDist.add(Integer.parseInt(temp[3])); 
+                followeesDist.add(Integer.parseInt((temp[3].substring(1, temp[3].length() - 1)))); 
             }
         } catch(FileNotFoundException e) {
             System.err.println("File friendDist.csv not found.");
@@ -110,7 +112,7 @@ public class TwitterSimul extends SimState {
      * @return A double representing the frequency at which a user tweets.
      */
     private double findFreq() {
-        int index = twist.nextInt() % frequencyDist.size();
+        int index = (twist.nextInt() % frequencyDist.size());
         return frequencyDist.get(index);
     }
     
@@ -132,7 +134,7 @@ public class TwitterSimul extends SimState {
     }
     
     public static void main(String[] args) {
-        doLoop(User.class, args);
+        doLoop(TwitterSimul.class, args);
         String relationshipContent = "";
         for(int a = 0; a < TwitterSimul.NUM_USERS; a++) {
             relationshipContent += users.get(a).toString();
