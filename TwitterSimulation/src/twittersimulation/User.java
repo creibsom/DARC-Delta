@@ -29,13 +29,14 @@ public class User implements Steppable {
         this.id = id;
         this.freq = freq;
         this.rn = rn;
+        System.out.println("" + id + ", " + freq + ", " + numFollowees);
         
         //Generate a list of followees and add them to the ArrayList
         int temp;
         for(int i = 0; i < numFollowees; i++) {
-           temp = this.rn.nextInt() % TwitterSimul.NUM_USERS;
+           temp = Math.abs(this.rn.nextInt() % TwitterSimul.NUM_USERS);
            while(temp == id || followees.contains(temp)) {
-               temp = this.rn.nextInt() % TwitterSimul.NUM_USERS;
+               temp = Math.abs(this.rn.nextInt() % TwitterSimul.NUM_USERS);
            }
            followees.add(temp);
         }
@@ -51,7 +52,7 @@ public class User implements Steppable {
         //Generate a random boolean with probability equal to the user's tweet
         //frequency. If true, tweet to a random user. If not, do nothing.
            if(rn.nextBoolean(freq)) {
-               int userToID = followees.get(rn.nextInt() % followees.size());
+               int userToID = followees.get(Math.abs(rn.nextInt() % followees.size()));
                int stepNum = (int) sim.schedule.getSteps();
                sim.catchTweet(sendTweet(userToID, stepNum));
            } 

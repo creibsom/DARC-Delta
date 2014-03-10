@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class TwitterSimul extends SimState {
     
     private final static HashMap<Integer, User> users = new HashMap();
-    public final static int NUM_USERS = 1000;
+    public final static int NUM_USERS = 260000;
     private final MersenneTwisterFast twist = new MersenneTwisterFast();
     private final ArrayList<Double> frequencyDist = new ArrayList();
     private final ArrayList<Integer> followeesDist = new ArrayList();
@@ -34,15 +34,18 @@ public class TwitterSimul extends SimState {
         super(seed);
     }
     
+    @Override
     public void start() {
         super.start();
         loadFreqFile();
         loadNumFolloweesFile();
-        User u = null;
+        User u;
+        System.out.println("Initializing users...");
         for(int i = 0; i < NUM_USERS; i++) {
             u = new User(i, findFreq(), findNumFollowees(), twist);
             users.put(i, u);
             schedule.scheduleRepeating(u);
+            System.out.println("User " + i + " scheduled.");
         }
     }
     
@@ -56,11 +59,11 @@ public class TwitterSimul extends SimState {
             br = new BufferedReader(new FileReader("degreeDist.csv"));
             String line;
             String[] temp;
-            line = br.readLine(); //Skip first line
+            br.readLine(); //Skip first line
             while((line = br.readLine()) != null) {
                 temp = line.split(",");
                 // 168 is the number of hours in a week
-                frequencyDist.add(((double) Integer.parseInt(temp[2])) / 168); 
+                frequencyDist.add(((double) Double.parseDouble(temp[2])) / 168); 
             }
         } catch(FileNotFoundException e) {
             System.err.println("File degreeDist.csv not found.");
@@ -87,7 +90,7 @@ public class TwitterSimul extends SimState {
             br = new BufferedReader(new FileReader("friendDist.csv"));
             String line;
             String[] temp;
-            line = br.readLine(); //Skip first line
+            br.readLine(); //Skip first line
             while((line = br.readLine()) != null) {
                 temp = line.split(",");
                 followeesDist.add(Integer.parseInt((temp[3].substring(1, temp[3].length() - 1)))); 
@@ -112,7 +115,7 @@ public class TwitterSimul extends SimState {
      * @return A double representing the frequency at which a user tweets.
      */
     private double findFreq() {
-        int index = (twist.nextInt() % frequencyDist.size());
+        int index = Math.abs(twist.nextInt() % frequencyDist.size());
         return frequencyDist.get(index);
     }
     
@@ -121,7 +124,7 @@ public class TwitterSimul extends SimState {
      * @return An int representing the number of followees the user will have.
      */
     private int findNumFollowees() {
-        int index = twist.nextInt() % followeesDist.size();
+        int index = Math.abs(twist.nextInt() % followeesDist.size());
         return followeesDist.get(index);
     }
     
