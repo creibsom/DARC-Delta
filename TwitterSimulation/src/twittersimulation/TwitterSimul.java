@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class TwitterSimul extends SimState {
     
     private final static HashMap<Integer, User> users = new HashMap();
-    public final static int NUM_USERS = 260000;
+    public final static int NUM_USERS = 35000;
     private final MersenneTwisterFast twist = new MersenneTwisterFast();
     private final ArrayList<Double> frequencyDist = new ArrayList();
     private final ArrayList<Integer> followeesDist = new ArrayList();
@@ -40,13 +40,15 @@ public class TwitterSimul extends SimState {
         loadFreqFile();
         loadNumFolloweesFile();
         User u;
-        System.out.println("Initializing users...");
+        System.out.print("Initializing users...");
         for(int i = 0; i < NUM_USERS; i++) {
             u = new User(i, findFreq(), findNumFollowees(), twist);
             users.put(i, u);
             schedule.scheduleRepeating(u);
-            System.out.println("User " + i + " scheduled.");
+            if(i % 1000 == 0)
+                System.out.print(".");
         }
+        System.out.print("\nSimulating");
     }
     
     /**
@@ -90,10 +92,13 @@ public class TwitterSimul extends SimState {
             br = new BufferedReader(new FileReader("friendDist.csv"));
             String line;
             String[] temp;
+            int val;
             br.readLine(); //Skip first line
             while((line = br.readLine()) != null) {
                 temp = line.split(",");
-                followeesDist.add(Integer.parseInt((temp[3].substring(1, temp[3].length() - 1)))); 
+                val = Integer.parseInt(temp[3].substring(1, temp[3].length() - 1));
+                if(val <= NUM_USERS)
+                    followeesDist.add(val); 
             }
         } catch(FileNotFoundException e) {
             System.err.println("File friendDist.csv not found.");
@@ -138,30 +143,41 @@ public class TwitterSimul extends SimState {
     
     public static void main(String[] args) {
         doLoop(TwitterSimul.class, args);
-        String relationshipContent = "";
-        for(int a = 0; a < TwitterSimul.NUM_USERS; a++) {
-            relationshipContent += users.get(a).toString();
-        }
-        String tweetContent = "";
-        for(int a = 0; a < tweets.size(); a++) {
-            tweetContent += tweets.get(a).toString();
-        }
+
+        System.out.print("Outputting to relations.csv");
+        //Print results to files.
         try {
             File file = new File("relations.csv");
-            if (!file.exists()) {
-                file.createNewFile();
+            //Ensure the file is empty before appending to it.
+            if (file.exists())
+                file.delete();
+            file.createNewFile();
+	    BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
+            //Print all relationships in csv style
+	    for(int a = 0; a < TwitterSimul.NUM_USERS; a++) {
+                    bw.write(users.get(a).toString());
+                    if(a % 100 == 0)
+                        System.out.print(".");
             }
-	    BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
-	    bw.write(relationshipContent);
             
+            System.out.print("\nOutputting to tweets.csv");
             file = new File("tweets.csv");
-            bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
-            bw.write(tweetContent);
+            //Ensure the file is empty before appending to it.
+            if (file.exists())
+                file.delete();
+            file.createNewFile();
+            bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
+            //Print all tweets in csv style
+            for(int a = 0; a < tweets.size(); a++) {
+                bw.write(tweets.get(a).toString());
+                if(a % 100 == 0) 
+                    System.out.print(".");
+            }
 	    bw.close();
  	} catch (IOException e) {
         	System.err.println("IOException - writing to relations.csv");
 	}
-        System.out.println("relations.csv and tweets.csv produced.");
+        System.out.println("\nrelations.csv and tweets.csv produced.");
         System.exit(0);
     }
 }
