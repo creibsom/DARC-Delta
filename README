@@ -8,7 +8,7 @@ Java Simulation:
 
 * cd TwitterSimulation
 * javac src/twittersimulation/TwitterSimul.java src/twittersimulation/User.java src/twittersimulation/Tweet.java
-* java TwitterSimul -time numHoursToSimulate
+* java -Xmx 1024m TwitterSimul -until numHoursToSimulate
 
 User relations will be output to "relations.csv"
 Tweets will be output to "tweets.csv"
