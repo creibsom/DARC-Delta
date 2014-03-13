@@ -53,7 +53,7 @@ public class User implements Steppable {
            if(followees.size() > 0 && (freq > 1 || rn.nextBoolean(freq))) {
                int userToID = followees.get(Math.abs(rn.nextInt() % followees.size()));
                int stepNum = (int) sim.schedule.getSteps();
-               System.out.println(".");
+               System.out.print(".");
                sim.catchTweet(sendTweet(userToID, stepNum));
            } 
     }

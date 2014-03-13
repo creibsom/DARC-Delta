@@ -142,7 +142,8 @@ public class TwitterSimul extends SimState {
     }
     
     public static void main(String[] args) {
-        doLoop(TwitterSimul.class, args);
+        String[] flags = {"-until", "168"};
+        doLoop(TwitterSimul.class, flags);
 
         System.out.print("Outputting to relations.csv");
         //Print results to files.
