@@ -23,7 +23,7 @@ import sim.util.distribution.Exponential;
 public class TwitterSimul extends SimState {
     
     private final static HashMap<Integer, User> users = new HashMap();
-    public final static int NUM_USERS = 10000;
+    public final static int NUM_USERS = 35000;
     private final MersenneTwisterFast twist = new MersenneTwisterFast();
     private final Exponential exp = new Exponential(0, twist);
     private final ArrayList<Double> frequencyDist = new ArrayList();
@@ -68,8 +68,7 @@ public class TwitterSimul extends SimState {
             br.readLine(); //Skip first line
             while((line = br.readLine()) != null) {
                 temp = line.split(",");
-                // 168 is the number of hours in a week, so this is the average time between tweets
-                frequencyDist.add(((double) 168 / Double.parseDouble(temp[1]))); 
+                frequencyDist.add(((double) Double.parseDouble(temp[1]))); 
             }
         } catch(FileNotFoundException e) {
             System.err.println("File tweetsPerWeekDist.csv not found.");
@@ -179,7 +178,7 @@ public class TwitterSimul extends SimState {
             //Print all tweets in csv style
             for(int a = 0; a < tweets.size(); a++) {
                 bw.write(tweets.get(a).toString());
-                if(a % 100 == 0) 
+                if(a % (tweets.size()/100) == 0) 
                     System.out.print(".");
             }
 	    bw.close();
