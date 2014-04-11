@@ -8,18 +8,18 @@ package twittersimulation;
 public class Tweet {
 
     private final int tweeterID, tweeteeID;
-    private final int hourOfTweet;
+    private final double time;
     
     /**
      * Constructs a new Tweet object.
      * @param tweeterID Unique ID of user sending the tweet
      * @param tweeteeID Unique ID of user receiving the tweet
-     * @param hourOfTweet Hour that the tweet was sent
+     * @param time Hour that the tweet was sent
      */
-    public Tweet(int tweeterID, int tweeteeID, int hourOfTweet) {
+    public Tweet(int tweeterID, int tweeteeID, double time) {
         this.tweeterID = tweeterID;
         this.tweeteeID = tweeteeID;
-        this.hourOfTweet = hourOfTweet;
+        this.time = time;
     }
     
     /**
@@ -28,6 +28,6 @@ public class Tweet {
      */
     @Override
     public String toString() {
-        return "" + tweeterID + "," + tweeteeID + "," + hourOfTweet + "\n";
+        return "" + tweeterID + "," + tweeteeID + "," + time + "\n";
     }
 }
