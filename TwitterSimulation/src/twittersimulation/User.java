@@ -36,7 +36,7 @@ public class User implements Steppable {
         
         //Generate a list of followees and add them to the ArrayList
         int temp;
-        double alpha = 2.730885;
+        double alpha = 2.85581087146523;
         for(int i = 0; i < numTweetables; i++) {
            temp = (int) Math.floor(sim.util.distribution.Distributions.nextPowLaw(alpha, TwitterSimul.NUM_USERS, this.rn));
            while(temp == id || tweetables.contains(temp)) {

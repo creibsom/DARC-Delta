@@ -62,7 +62,7 @@ public class TwitterSimul extends SimState {
     private void loadFreqFile() {
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader("tweetsPerWeekDist.csv"));
+            br = new BufferedReader(new FileReader("satTweetsPerDay.csv"));
             String line;
             String[] temp;
             br.readLine(); //Skip first line
@@ -92,7 +92,7 @@ public class TwitterSimul extends SimState {
     private void loadNumTweetablesFile() {
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader("potentialTweeteeDist.csv"));
+            br = new BufferedReader(new FileReader("satPotentialTweetee.csv"));
             String line;
             String[] temp;
             int val;
@@ -149,7 +149,7 @@ public class TwitterSimul extends SimState {
     
     public static void main(String[] args) {
         String timestamp = new SimpleDateFormat("MM-dd-yyyy_hh-mm a ").format(new Date());
-        String[] flags = {"-until", "168"};
+        String[] flags = {"-until", "24"};
         doLoop(TwitterSimul.class, flags);
 
 //        System.out.print("Outputting to " + timestamp + "relations.csv");
