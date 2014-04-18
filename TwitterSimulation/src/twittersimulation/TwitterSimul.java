@@ -8,9 +8,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import sim.engine.*;
 import java.util.HashMap;
+import static sim.engine.SimState.doLoop;
+import sim.util.distribution.Exponential;
         
 /**
  * Container class for Twitter social network simulation.
@@ -22,8 +26,9 @@ public class TwitterSimul extends SimState {
     private final static HashMap<Integer, User> users = new HashMap();
     public final static int NUM_USERS = 35000;
     private final MersenneTwisterFast twist = new MersenneTwisterFast();
+    private final Exponential exp = new Exponential(0, twist);
     private final ArrayList<Double> frequencyDist = new ArrayList();
-    private final ArrayList<Integer> followeesDist = new ArrayList();
+    private final ArrayList<Integer> tweetablesDist = new ArrayList();
     private final static ArrayList<Tweet> tweets = new ArrayList();
     
     /**
@@ -38,78 +43,77 @@ public class TwitterSimul extends SimState {
     public void start() {
         super.start();
         loadFreqFile();
-        loadNumFolloweesFile();
+        loadNumTweetablesFile();
         User u;
         System.out.print("Initializing users...");
         for(int i = 0; i < NUM_USERS; i++) {
-            u = new User(i, findFreq(), findNumFollowees(), twist);
+            u = new User(i, findFreq(), findNumTweetables(), twist, exp);
             users.put(i, u);
-            schedule.scheduleRepeating(u);
+            schedule.scheduleOnce(Math.abs(exp.nextDouble(u.getFreq())), u);
             if(i % 1000 == 0)
                 System.out.print(".");
         }
         System.out.print("\nSimulating");
     }
     
-    /**
+/**
      * Loads empirical frequencies into  an ArrayList (frequencyDist)
      * from degreeDist.csv
      */
     private void loadFreqFile() {
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader("degreeDist.csv"));
+            br = new BufferedReader(new FileReader("wedTweetsPerDay.csv"));
             String line;
             String[] temp;
             br.readLine(); //Skip first line
             while((line = br.readLine()) != null) {
                 temp = line.split(",");
-                // 168 is the number of hours in a week
-                frequencyDist.add(((double) Double.parseDouble(temp[2])) / 168); 
+                frequencyDist.add(((double) Double.parseDouble(temp[1]))); 
             }
         } catch(FileNotFoundException e) {
-            System.err.println("File degreeDist.csv not found.");
+            System.err.println("File tweetsPerWeekDist.csv not found.");
         } catch(IOException e) {
-            System.err.println("IOException - reading degreeDist.csv");
+            System.err.println("IOException - reading tweetsPerWeekDist.csv");
         } finally {
             if(br != null) {
                 try {
                     br.close();
 		} catch (IOException e) {
-                    System.err.println("IOException - closing degreeDist.csv");
+                    System.err.println("IOException - closing tweetsPerWeekDist.csv");
                 }
             }
         }
     }
     
     /**
-     * Loads empirical followee counts into an ArrayList (followeesDist)
+     * Loads empirical tweetable counts into an ArrayList (followeesDist)
      * from friendDist.csv
      */
-    private void loadNumFolloweesFile() {
+    private void loadNumTweetablesFile() {
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader("friendDist.csv"));
+            br = new BufferedReader(new FileReader("wedPotentialTweetee.csv"));
             String line;
             String[] temp;
             int val;
             br.readLine(); //Skip first line
             while((line = br.readLine()) != null) {
                 temp = line.split(",");
-                val = Integer.parseInt(temp[3].substring(1, temp[3].length() - 1));
+                val = Integer.parseInt(temp[1]);
                 if(val <= NUM_USERS)
-                    followeesDist.add(val); 
+                    tweetablesDist.add(val); 
             }
         } catch(FileNotFoundException e) {
-            System.err.println("File friendDist.csv not found.");
+            System.err.println("File potentialTweeteeDist.csv not found.");
         } catch(IOException e) {
-            System.err.println("IOException - reading friendDist.csv");
+            System.err.println("IOException - reading potentialTweeteeDist.csv");
         } finally {
             if(br != null) {
                 try {
                     br.close();
 		} catch (IOException e) {
-                    System.err.println("IOException - closing friendDist.csv");
+                    System.err.println("IOException - closing potentialTweeteeDist.csv");
                 }
             }
         }
@@ -125,12 +129,15 @@ public class TwitterSimul extends SimState {
     }
     
     /**
-     * Returns a user's followee count, drawn from an empirical distribution.
-     * @return An int representing the number of followees the user will have.
+     * Returns a user's tweetable count, drawn from an empirical distribution.
+     * @return An int representing the number of tweetabless the user will have.
      */
-    private int findNumFollowees() {
-        int index = Math.abs(twist.nextInt() % followeesDist.size());
-        return followeesDist.get(index);
+    private int findNumTweetables() {
+        int index = Math.abs(twist.nextInt() % tweetablesDist.size());
+        while(tweetablesDist.get(index) > NUM_USERS) {
+            index = Math.abs(twist.nextInt() % tweetablesDist.size());
+        }
+        return tweetablesDist.get(index);
     }
     
     /**
@@ -142,43 +149,44 @@ public class TwitterSimul extends SimState {
     }
     
     public static void main(String[] args) {
-        String[] flags = {"-until", "168"};
+        String timestamp = new SimpleDateFormat("MM-dd-yyyy_hh-mm a ").format(new Date());
+        String[] flags = {"-until", "24"};
         doLoop(TwitterSimul.class, flags);
 
-        System.out.print("Outputting to relations.csv");
+//        System.out.print("Outputting to " + timestamp + "relations.csv");
         //Print results to files.
         try {
-            File file = new File("relations.csv");
-            //Ensure the file is empty before appending to it.
-            if (file.exists())
-                file.delete();
-            file.createNewFile();
-	    BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
-            //Print all relationships in csv style
-	    for(int a = 0; a < TwitterSimul.NUM_USERS; a++) {
-                    bw.write(users.get(a).toString());
-                    if(a % 100 == 0)
-                        System.out.print(".");
-            }
+//            File file = new File(timestamp + "relations.csv");
+//            //Ensure the file is empty before appending to it.
+//            if (file.exists())
+//                file.delete();
+//            file.createNewFile();
+//	    BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
+//            //Print all relationships in csv style
+//	    for(int a = 0; a < TwitterSimul.NUM_USERS; a++) {
+//                    bw.write(users.get(a).toString());
+//                    if(a % 100 == 0)
+//                        System.out.print(".");
+//            }
             
-            System.out.print("\nOutputting to tweets.csv");
-            file = new File("tweets.csv");
+            System.out.print("\nOutputting to " + timestamp + "tweets.csv");
+            File file = new File(timestamp + "tweets.csv");
             //Ensure the file is empty before appending to it.
             if (file.exists())
                 file.delete();
             file.createNewFile();
-            bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
             //Print all tweets in csv style
             for(int a = 0; a < tweets.size(); a++) {
                 bw.write(tweets.get(a).toString());
-                if(a % 100 == 0) 
+                if(a % (tweets.size()/100) == 0) 
                     System.out.print(".");
             }
 	    bw.close();
  	} catch (IOException e) {
-        	System.err.println("IOException - writing to relations.csv");
+        	System.err.println("IOException - writing to file");
 	}
-        System.out.println("\nrelations.csv and tweets.csv produced.");
+        System.out.println("\n" + timestamp + "tweets.csv produced.");
         System.exit(0);
     }
 }
